@@ -27,18 +27,13 @@ A comprehensive Q&A platform built with Next.js, TypeScript, and Node.js that fe
 - **Socket.IO Integration**: Real-time communication and updates
 - **Activity Tracking**: Monitor user engagement and platform activity
 
-### Admin & Moderation
-- **Admin Dashboard**: Comprehensive analytics, user management, and moderation tools
-- **User Management**: Ban/unban users, change roles, monitor activity
-- **Content Moderation**: Review and moderate questions and answers
-- **Analytics**: Detailed platform usage statistics and trends
+
 
 ### Technical Excellence
 - **TypeScript**: Full type safety across frontend and backend
 - **Responsive Design**: Mobile-first approach with beautiful UI/UX
-- **Accessibility**: WCAG compliant with proper ARIA labels and keyboard navigation
 - **Performance**: Optimized with React Query, lazy loading, and efficient caching
-- **Security**: JWT authentication, rate limiting, input validation
+- **Security**: rate limiting, input validation
 
 ## 🛠️ Tech Stack
 
@@ -69,7 +64,7 @@ A comprehensive Q&A platform built with Next.js, TypeScript, and Node.js that fe
 
 ### Prerequisites
 - Node.js 18+ 
-- MongoDB (local or Atlas)
+- MongoDB (Atlas)
 - npm or yarn
 
 ### Backend Setup
@@ -85,12 +80,12 @@ A comprehensive Q&A platform built with Next.js, TypeScript, and Node.js that fe
    ```
 
 3. **Create environment file:**
-   ```bash
-   cp env.example .env
+   ```Orginal env file psuhed for evaluation purpose
    ```
 
 4. **Configure environment variables:**
-   ```env
+   ```wana use your credantial?  then add this and edit url.
+   env
    MONGODB_URI=mongodb://localhost:27017/qa-platform
    JWT_SECRET=your-super-secret-jwt-key
    PORT=5000
@@ -115,8 +110,7 @@ A comprehensive Q&A platform built with Next.js, TypeScript, and Node.js that fe
    ```
 
 3. **Create environment file:**
-   ```bash
-   cp env.local.example .env.local
+   ```
    ```
 
 4. **Configure environment variables:**
@@ -131,13 +125,6 @@ A comprehensive Q&A platform built with Next.js, TypeScript, and Node.js that fe
    npm run dev
    ```
 
-## 🎯 Quick Start
-
-1. **Start MongoDB** (if using local instance)
-2. **Start backend server** (`cd backend && npm run dev`)
-3. **Start frontend** (`cd frontend && npm run dev`)
-4. **Visit** `http://localhost:3000`
-5. **Register** a new account and start exploring!
 
 ## 📁 Project Structure
 
@@ -165,8 +152,7 @@ qa-platform/
 ### Authentication
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
-- `GET /api/auth/me` - Get current user
-- `PUT /api/auth/profile` - Update profile
+
 
 ### Questions
 - `GET /api/questions` - Get all questions
@@ -178,7 +164,6 @@ qa-platform/
 
 ### Answers
 - `POST /api/answers` - Create answer
-- `PUT /api/answers/:id` - Update answer
 - `DELETE /api/answers/:id` - Delete answer
 - `POST /api/answers/:id/vote` - Vote on answer
 
@@ -194,7 +179,7 @@ qa-platform/
 ## 🎨 Key Features Demo
 
 ### StackPoints & Gamification
-- Ask a question: +5 points
+- Ask a question: +10 points
 - Answer a question: +10 points
 - Get upvoted: +2 points (question) / +5 points (answer)
 - Have answer accepted: +15 points
@@ -210,43 +195,8 @@ qa-platform/
 - Real-time chat and activity updates
 - Instant feedback on actions
 
-## 🚀 Deployment
-
-### Backend Deployment
-1. Set up MongoDB Atlas or other cloud database
-2. Configure environment variables for production
-3. Deploy to Heroku, Railway, or your preferred platform
-
-### Frontend Deployment
-1. Build the application: `npm run build`
-2. Deploy to Vercel, Netlify, or your preferred platform
-3. Configure environment variables
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
 
 ## 📄 License
 
 This project is licensed under the MIT License.
 
-## 🎉 Hackathon Ready
-
-This project is optimized for hackathon presentations with:
-- **Impressive UI/UX** with smooth animations
-- **Demo-friendly features** that showcase technical excellence
-- **Production-ready code** with proper error handling
-- **Comprehensive documentation** for judges
-- **Scalable architecture** for future development
-
-## 🆘 Support
-
-For support, email support@qaplatform.com or create an issue in the repository.
-
----
-
-**Built with ❤️ for the developer community** 
