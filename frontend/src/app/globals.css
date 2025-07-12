@@ -24,3 +24,60 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Ensure all form inputs have dark, visible text */
+input, textarea, select {
+  color: #1f2937 !important; /* text-gray-800 */
+  opacity: 1 !important;
+}
+
+/* Ensure contenteditable elements have dark, visible text */
+[contenteditable="true"] {
+  color: #1f2937 !important; /* text-gray-800 */
+  opacity: 1 !important;
+}
+
+/* Ensure placeholder text is visible but slightly lighter */
+input::placeholder, textarea::placeholder {
+  color: #6b7280 !important; /* text-gray-500 */
+  opacity: 1 !important;
+}
+
+/* Ensure rich text editor content is dark and visible */
+.prose {
+  color: #1f2937 !important; /* text-gray-800 */
+  opacity: 1 !important;
+}
+
+.prose p, .prose div, .prose span {
+  color: #1f2937 !important; /* text-gray-800 */
+  opacity: 1 !important;
+}
+
+/* Ensure any content inserted into rich text editor has dark text */
+[contenteditable="true"] * {
+  color: #1f2937 !important; /* text-gray-800 */
+  opacity: 1 !important;
+}
+
+/* Ensure links in rich text editor are visible */
+[contenteditable="true"] a {
+  color: #2563eb !important; /* text-blue-600 */
+  opacity: 1 !important;
+}
+
+/* Ensure bold text is dark and visible */
+[contenteditable="true"] strong,
+[contenteditable="true"] b {
+  color: #1f2937 !important; /* text-gray-800 */
+  opacity: 1 !important;
+  font-weight: 600 !important;
+}
+
+/* Ensure italic text is dark and visible */
+[contenteditable="true"] em,
+[contenteditable="true"] i {
+  color: #1f2937 !important; /* text-gray-800 */
+  opacity: 1 !important;
+  font-style: italic !important;
+}

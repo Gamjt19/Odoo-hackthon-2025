@@ -269,9 +269,10 @@ export default function QuestionsPage() {
                       </h3>
                     </Link>
                     
-                    <p className="text-gray-600 mb-3 line-clamp-2">
-                      {question.content}
-                    </p>
+                    <div 
+                      className="text-gray-600 mb-3 line-clamp-2"
+                      dangerouslySetInnerHTML={{ __html: question.content }}
+                    />
 
                     {/* Tags */}
                     <div className="flex items-center gap-2 mb-3">

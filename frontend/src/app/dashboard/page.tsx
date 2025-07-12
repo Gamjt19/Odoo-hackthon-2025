@@ -197,7 +197,10 @@ export default function DashboardPage() {
                         >
                           {question.title}
                         </Link>
-                        <p className="text-gray-600 mt-2 line-clamp-2">{question.content}</p>
+                        <div 
+                          className="text-gray-600 mt-2 line-clamp-2"
+                          dangerouslySetInnerHTML={{ __html: question.content }}
+                        />
                         <div className="flex items-center gap-4 mt-3">
                           <div className="flex items-center gap-1 text-sm text-gray-500">
                             <ThumbsUp className="h-4 w-4" />

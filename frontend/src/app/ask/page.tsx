@@ -13,6 +13,7 @@ import {
   Plus,
   X
 } from 'lucide-react';
+import RichTextEditor from '@/components/RichTextEditor';
 
 interface Tag {
   name: string;
@@ -241,22 +242,12 @@ export default function AskQuestionPage() {
               <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
                 Question Details *
               </label>
-              <textarea
-                id="content"
+              <RichTextEditor
                 value={formData.content}
-                onChange={(e) => handleInputChange('content', e.target.value)}
-                rows={8}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none ${
-                  errors.content ? 'border-red-300' : 'border-gray-300'
-                }`}
+                onChange={(value) => handleInputChange('content', value)}
                 placeholder="Provide more context about your question. Include code examples, error messages, or any relevant details."
+                error={errors.content}
               />
-              {errors.content && (
-                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.content}
-                </p>
-              )}
             </div>
 
             {/* Category */}

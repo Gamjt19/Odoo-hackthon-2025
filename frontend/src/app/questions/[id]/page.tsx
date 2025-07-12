@@ -23,6 +23,7 @@ import {
   Send,
   Award
 } from 'lucide-react';
+import RichTextEditor from '@/components/RichTextEditor';
 
 interface User {
   _id: string;
@@ -439,7 +440,10 @@ export default function QuestionDetailPage() {
 
                 {/* Question Content */}
                 <div className="prose max-w-none mb-6">
-                  <p className="text-gray-800 whitespace-pre-wrap">{question.content}</p>
+                  <div 
+                    className="text-gray-800"
+                    dangerouslySetInnerHTML={{ __html: question.content }}
+                  />
                 </div>
 
                 {/* Question Tags */}
@@ -580,7 +584,10 @@ export default function QuestionDetailPage() {
                       {/* Answer Content */}
                       <div className="flex-1">
                         <div className="prose max-w-none mb-4">
-                          <p className="text-gray-800 whitespace-pre-wrap">{answer.content}</p>
+                          <div 
+                            className="text-gray-800"
+                            dangerouslySetInnerHTML={{ __html: answer.content }}
+                          />
                         </div>
 
                         {/* Answer Footer */}
@@ -689,11 +696,9 @@ export default function QuestionDetailPage() {
                 <div className="p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Answer</h3>
                   <form onSubmit={handleSubmitAnswer}>
-                    <textarea
+                    <RichTextEditor
                       value={newAnswer}
-                      onChange={(e) => setNewAnswer(e.target.value)}
-                      rows={6}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                      onChange={setNewAnswer}
                       placeholder="Write your answer here..."
                     />
                     <div className="flex items-center justify-between mt-4">
