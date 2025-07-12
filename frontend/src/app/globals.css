@@ -19,6 +19,15 @@
   }
 }
 
+/* Force LTR for entire document */
+html, body {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -51,7 +60,7 @@ input, textarea, select {
   text-orientation: mixed !important;
 }
 
-/* Specific rich text editor overrides */
+/* Specific rich text editor overrides with higher specificity */
 .prose,
 .prose *,
 .prose p,
@@ -207,6 +216,44 @@ div[contenteditable="true"] br,
 div[contenteditable="true"] p,
 div[contenteditable="true"] div,
 div[contenteditable="true"] span {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
+/* Ultra-specific overrides for contenteditable with dir attribute */
+div[contenteditable="true"][dir="ltr"],
+div[contenteditable="true"][dir="ltr"] * {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
+/* Override any potential CSS that might be setting RTL */
+:where(div[contenteditable="true"]) {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
+/* Force LTR for any element that might have RTL set */
+[dir="rtl"] * {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
+/* Specific override for prose elements in contenteditable */
+div[contenteditable="true"] .prose,
+div[contenteditable="true"] .prose * {
   direction: ltr !important;
   text-align: left !important;
   unicode-bidi: plaintext !important;

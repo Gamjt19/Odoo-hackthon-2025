@@ -54,14 +54,89 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   ];
 
   useEffect(() => {
+    // Inject global styles to force LTR
+    const style = document.createElement('style');
+    style.textContent = `
+      * {
+        direction: ltr !important;
+        text-align: left !important;
+        unicode-bidi: plaintext !important;
+        writing-mode: horizontal-tb !important;
+        text-orientation: mixed !important;
+      }
+      [contenteditable="true"] {
+        direction: ltr !important;
+        text-align: left !important;
+        unicode-bidi: plaintext !important;
+        writing-mode: horizontal-tb !important;
+        text-orientation: mixed !important;
+      }
+      [contenteditable="true"] * {
+        direction: ltr !important;
+        text-align: left !important;
+        unicode-bidi: plaintext !important;
+        writing-mode: horizontal-tb !important;
+        text-orientation: mixed !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Override document direction
+    document.documentElement.setAttribute('dir', 'ltr');
+    document.body.setAttribute('dir', 'ltr');
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
+  useEffect(() => {
     if (editorRef.current) {
       editorRef.current.innerHTML = value;
       // Force LTR direction
+      editorRef.current.setAttribute('dir', 'ltr');
       editorRef.current.style.direction = 'ltr';
       editorRef.current.style.textAlign = 'left';
       editorRef.current.style.unicodeBidi = 'plaintext';
       editorRef.current.style.writingMode = 'horizontal-tb';
       editorRef.current.style.textOrientation = 'mixed';
+      
+      // Set up MutationObserver to continuously monitor and fix direction
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'childList' || mutation.type === 'attributes') {
+            if (editorRef.current) {
+              editorRef.current.setAttribute('dir', 'ltr');
+              editorRef.current.style.direction = 'ltr';
+              editorRef.current.style.textAlign = 'left';
+              editorRef.current.style.unicodeBidi = 'plaintext';
+              editorRef.current.style.writingMode = 'horizontal-tb';
+              editorRef.current.style.textOrientation = 'mixed';
+              
+              // Also fix any child elements
+              const allElements = editorRef.current.querySelectorAll('*');
+              allElements.forEach((el) => {
+                if (el instanceof HTMLElement) {
+                  el.style.direction = 'ltr';
+                  el.style.textAlign = 'left';
+                  el.style.unicodeBidi = 'plaintext';
+                  el.style.writingMode = 'horizontal-tb';
+                  el.style.textOrientation = 'mixed';
+                }
+              });
+            }
+          }
+        });
+      });
+      
+      observer.observe(editorRef.current, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'dir']
+      });
+      
+      return () => observer.disconnect();
     }
   }, [value]);
 
@@ -236,10 +311,22 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       <div
         ref={editorRef}
         contentEditable
+        dir="ltr"
         onInput={updateValue}
         onKeyDown={handleKeyDown}
         onFocus={() => {
           if (editorRef.current) {
+            editorRef.current.setAttribute('dir', 'ltr');
+            editorRef.current.style.direction = 'ltr';
+            editorRef.current.style.textAlign = 'left';
+            editorRef.current.style.unicodeBidi = 'plaintext';
+            editorRef.current.style.writingMode = 'horizontal-tb';
+            editorRef.current.style.textOrientation = 'mixed';
+          }
+        }}
+        onBlur={() => {
+          if (editorRef.current) {
+            editorRef.current.setAttribute('dir', 'ltr');
             editorRef.current.style.direction = 'ltr';
             editorRef.current.style.textAlign = 'left';
             editorRef.current.style.unicodeBidi = 'plaintext';
