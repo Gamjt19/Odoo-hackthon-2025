@@ -4,6 +4,8 @@
 
 A comprehensive Q&A platform built with Next.js, TypeScript, and Node.js that features gamification, anonymous posting, real-time notifications, rich text editing, and a vibrant learning community.
 
+##video of prototype:https://drive.google.com/file/d/1ilrCHAcXNyr8whlHZDzS1j1m65hFz5JU/view?usp=sharing
+
 ## 🚀 Features
 
 ### Core Features
