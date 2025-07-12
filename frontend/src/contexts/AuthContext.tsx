@@ -44,6 +44,7 @@ interface AuthContextType {
   register: (username: string, email: string, password: string) => Promise<void>
   logout: () => void
   updateProfile: (data: Partial<User>) => Promise<void>
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>
   refreshUser: () => Promise<void>
 }
 
@@ -151,6 +152,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    try {
+      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/auth/password`, {
+        currentPassword,
+        newPassword
+      })
+      toast.success('Password changed successfully')
+    } catch (error: any) {
+      const message = error.response?.data?.error || 'Password change failed'
+      toast.error(message)
+      throw error
+    }
+  }
+
   const refreshUser = async () => {
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`)
@@ -167,6 +182,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     register,
     logout,
     updateProfile,
+    changePassword,
     refreshUser
   }
 
