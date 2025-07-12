@@ -1,3 +1,5 @@
+# Problem Statement: StackIt – A Minimal Q&A Forum Platform Team Name: Etcetera Team Email Address: kcabsher@gmail.com
+
 # QA Platform - Learn, Share, and Grow Together
 
 A comprehensive Q&A platform built with Next.js, TypeScript, and Node.js that features gamification, anonymous posting, real-time notifications, and a vibrant learning community.
