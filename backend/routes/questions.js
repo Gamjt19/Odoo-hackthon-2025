@@ -4,6 +4,7 @@ const Question = require('../models/Question');
 const Answer = require('../models/Answer');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const NotificationService = require('../utils/notificationService');
 const { auth, optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -388,6 +389,14 @@ router.post('/:id/answers', auth, [
     // Populate author info for response
     await answer.populate('author', 'username avatar level stackPoints');
 
+    // Create notification for question author
+    await NotificationService.createAnswerNotification(
+      questionId,
+      answer._id,
+      req.user.id,
+      question.author
+    );
+
     res.status(201).json({
       message: 'Answer created successfully',
       answer: answer.getPublicData()
@@ -437,6 +446,13 @@ router.post('/:id/vote', auth, [
       if (author) {
         await author.addStackPoints(2, 'Question upvoted');
       }
+      
+      // Create notification for question upvote
+      await NotificationService.createQuestionUpvoteNotification(
+        question._id,
+        req.user.id,
+        question.author
+      );
     }
 
     console.log('Vote successful, returning updated question');
@@ -488,9 +504,9 @@ router.post('/:id/accept-answer/:answerId', auth, async (req, res) => {
     }
 
     // Create notification for answer author
-    await Notification.createAnswerAcceptedNotification(
-      answer._id,
+    await NotificationService.createAnswerAcceptedNotification(
       question._id,
+      answer._id,
       answer.author
     );
 
@@ -525,7 +541,27 @@ router.post('/:id/comment', auth, [
     }
 
     const { content } = req.body;
-    await question.addComment(req.user.id, content);
+    const comment = await question.addComment(req.user.id, content);
+
+    // Create notification for question comment
+    await NotificationService.createQuestionCommentNotification(
+      question._id,
+      comment._id,
+      req.user.id,
+      question.author
+    );
+
+    // Check for mentions in comment
+    const mentions = NotificationService.extractMentions(content);
+    for (const mention of mentions) {
+      await NotificationService.createMentionNotification(
+        question._id,
+        null,
+        comment._id,
+        req.user.id,
+        mention
+      );
+    }
 
     res.json({
       message: 'Comment added successfully',

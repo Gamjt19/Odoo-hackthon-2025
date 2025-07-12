@@ -67,10 +67,10 @@ router.put('/:id/read', auth, async (req, res) => {
   }
 });
 
-// @route   PUT /api/notifications/read-all
+// @route   PUT /api/notifications/mark-all-read
 // @desc    Mark all notifications as read
 // @access  Private
-router.put('/read-all', auth, async (req, res) => {
+router.put('/mark-all-read', auth, async (req, res) => {
   try {
     await Notification.markAllAsRead(req.user.id);
 
@@ -90,6 +90,29 @@ router.get('/unread-count', auth, async (req, res) => {
     res.json({ count });
   } catch (error) {
     console.error('Get unread count error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// @route   DELETE /api/notifications/:id
+// @desc    Delete a notification
+// @access  Private
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const notification = await Notification.findById(req.params.id);
+    if (!notification) {
+      return res.status(404).json({ error: 'Notification not found' });
+    }
+
+    if (notification.recipient.toString() !== req.user.id) {
+      return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    await Notification.findByIdAndDelete(req.params.id);
+
+    res.json({ message: 'Notification deleted successfully' });
+  } catch (error) {
+    console.error('Delete notification error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

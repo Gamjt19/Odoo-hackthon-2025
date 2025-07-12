@@ -56,17 +56,37 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   useEffect(() => {
     if (editorRef.current) {
       editorRef.current.innerHTML = value;
+      // Force LTR direction
+      editorRef.current.style.direction = 'ltr';
+      editorRef.current.style.textAlign = 'left';
+      editorRef.current.style.unicodeBidi = 'plaintext';
+      editorRef.current.style.writingMode = 'horizontal-tb';
+      editorRef.current.style.textOrientation = 'mixed';
     }
   }, [value]);
 
   const execCommand = (command: string, value?: string) => {
     document.execCommand(command, false, value);
     editorRef.current?.focus();
+    // Force LTR direction after command execution
+    if (editorRef.current) {
+      editorRef.current.style.direction = 'ltr';
+      editorRef.current.style.textAlign = 'left';
+      editorRef.current.style.unicodeBidi = 'plaintext';
+      editorRef.current.style.writingMode = 'horizontal-tb';
+      editorRef.current.style.textOrientation = 'mixed';
+    }
     updateValue();
   };
 
   const updateValue = () => {
     if (editorRef.current) {
+      // Force LTR direction before updating
+      editorRef.current.style.direction = 'ltr';
+      editorRef.current.style.textAlign = 'left';
+      editorRef.current.style.unicodeBidi = 'plaintext';
+      editorRef.current.style.writingMode = 'horizontal-tb';
+      editorRef.current.style.textOrientation = 'mixed';
       onChange(editorRef.current.innerHTML);
     }
   };
@@ -75,6 +95,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (e.key === 'Enter' && e.shiftKey) {
       e.preventDefault();
       execCommand('insertLineBreak');
+    }
+    // Force LTR direction on every key press
+    if (editorRef.current) {
+      editorRef.current.style.direction = 'ltr';
+      editorRef.current.style.textAlign = 'left';
+      editorRef.current.style.unicodeBidi = 'plaintext';
+      editorRef.current.style.writingMode = 'horizontal-tb';
+      editorRef.current.style.textOrientation = 'mixed';
     }
   };
 
@@ -210,12 +238,26 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         contentEditable
         onInput={updateValue}
         onKeyDown={handleKeyDown}
+        onFocus={() => {
+          if (editorRef.current) {
+            editorRef.current.style.direction = 'ltr';
+            editorRef.current.style.textAlign = 'left';
+            editorRef.current.style.unicodeBidi = 'plaintext';
+            editorRef.current.style.writingMode = 'horizontal-tb';
+            editorRef.current.style.textOrientation = 'mixed';
+          }
+        }}
         className="p-4 min-h-[200px] outline-none prose prose-sm max-w-none text-gray-900"
         data-placeholder={placeholder}
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f3f4f6' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           color: '#1f2937',
-          opacity: '1'
+          opacity: '1',
+          direction: 'ltr',
+          textAlign: 'left',
+          unicodeBidi: 'plaintext',
+          writingMode: 'horizontal-tb',
+          textOrientation: 'mixed'
         }}
       />
 

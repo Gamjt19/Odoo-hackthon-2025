@@ -4,6 +4,7 @@ const Answer = require('../models/Answer');
 const Question = require('../models/Question');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const NotificationService = require('../utils/notificationService');
 const { auth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -87,11 +88,11 @@ router.post('/', auth, [
 
     // Create notification for question author
     if (!question.isAnonymous) {
-      await Notification.createQuestionAnsweredNotification(
+      await NotificationService.createAnswerNotification(
         question._id,
         answer._id,
-        question.author,
-        req.user.id
+        req.user.id,
+        question.author
       );
     }
 
@@ -239,6 +240,14 @@ router.post('/:id/vote', auth, [
       if (author) {
         await author.addStackPoints(5, 'Answer upvoted');
       }
+      
+      // Create notification for answer upvote
+      await NotificationService.createAnswerUpvoteNotification(
+        answer.question,
+        answer._id,
+        req.user.id,
+        answer.author
+      );
     }
 
     console.log('Vote successful, returning updated answer');
@@ -273,7 +282,28 @@ router.post('/:id/comment', auth, [
     }
 
     const { content } = req.body;
-    await answer.addComment(req.user.id, content);
+    const comment = await answer.addComment(req.user.id, content);
+
+    // Create notification for answer comment
+    await NotificationService.createAnswerCommentNotification(
+      answer.question,
+      answer._id,
+      comment._id,
+      req.user.id,
+      answer.author
+    );
+
+    // Check for mentions in comment
+    const mentions = NotificationService.extractMentions(content);
+    for (const mention of mentions) {
+      await NotificationService.createMentionNotification(
+        answer.question,
+        answer._id,
+        comment._id,
+        req.user.id,
+        mention
+      );
+    }
 
     res.json({
       message: 'Comment added successfully',

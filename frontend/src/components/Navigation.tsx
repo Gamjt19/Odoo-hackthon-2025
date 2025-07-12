@@ -17,14 +17,18 @@ import {
 } from 'lucide-react'
 // import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
+import NotificationDropdown from './NotificationDropdown'
 
 const Navigation: React.FC = () => {
   const { user, logout } = useAuth()
   const { trackPageView } = useAnalytics()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
   const userMenuRef = useRef<HTMLDivElement>(null)
+  const notificationRef = useRef<HTMLDivElement>(null)
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,6 +49,9 @@ const Navigation: React.FC = () => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false)
       }
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setIsNotificationOpen(false)
+      }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
@@ -52,6 +59,31 @@ const Navigation: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  // Fetch unread notification count
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      if (!user) return
+      
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notifications/unread-count`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        if (response.ok) {
+          const data = await response.json()
+          setUnreadCount(data.count)
+        }
+      } catch (error) {
+        console.error('Error fetching unread count:', error)
+      }
+    }
+
+    fetchUnreadCount()
+    const interval = setInterval(fetchUnreadCount, 30000) // Check every 30 seconds
+    return () => clearInterval(interval)
+  }, [user])
 
   const getLevelColor = (level: string) => {
     switch (level) {
@@ -122,12 +154,33 @@ const Navigation: React.FC = () => {
                 </Link>
 
                 {/* Notifications */}
-                <button className="relative p-2 text-gray-700 hover:text-blue-600">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    3
-                  </span>
-                </button>
+                <div className="relative" ref={notificationRef}>
+                  <button 
+                    onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                    className="relative p-2 text-gray-700 hover:text-blue-600 transition-colors"
+                  >
+                    <Bell className="h-5 w-5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </button>
+                  
+                  <NotificationDropdown 
+                    isOpen={isNotificationOpen}
+                    onClose={() => setIsNotificationOpen(false)}
+                  />
+                  
+                  {/* Mobile notification link */}
+                  <Link
+                    href="/notifications"
+                    className="md:hidden block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Notifications ({unreadCount})
+                  </Link>
+                </div>
 
                 {/* User Menu */}
                 <div className="relative" ref={userMenuRef}>
@@ -186,6 +239,16 @@ const Navigation: React.FC = () => {
                           }}
                         >
                           Ask Question
+                        </Link>
+                        <Link 
+                          href="/notifications" 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => {
+                            trackPageView('notifications')
+                            setIsUserMenuOpen(false)
+                          }}
+                        >
+                          Notifications ({unreadCount})
                         </Link>
                         <hr className="my-2" />
                         <button

@@ -23,47 +23,89 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  direction: ltr !important;
+  text-align: left !important;
 }
 
-/* Ensure all form inputs have dark, visible text */
+/* Override any RTL settings and force LTR for all text inputs */
 input, textarea, select {
   color: #1f2937 !important; /* text-gray-800 */
   opacity: 1 !important;
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
 }
 
-/* Ensure contenteditable elements have dark, visible text */
-[contenteditable="true"] {
+/* Aggressive LTR forcing for contenteditable elements */
+[contenteditable="true"],
+[contenteditable="true"] *,
+[contenteditable="true"]::before,
+[contenteditable="true"]::after {
   color: #1f2937 !important; /* text-gray-800 */
   opacity: 1 !important;
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
+/* Specific rich text editor overrides */
+.prose,
+.prose *,
+.prose p,
+.prose div,
+.prose span,
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6,
+.prose ul,
+.prose ol,
+.prose li,
+.prose blockquote,
+.prose pre,
+.prose code {
+  color: #1f2937 !important; /* text-gray-800 */
+  opacity: 1 !important;
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
 }
 
 /* Ensure placeholder text is visible but slightly lighter */
 input::placeholder, textarea::placeholder {
   color: #6b7280 !important; /* text-gray-500 */
   opacity: 1 !important;
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
 }
 
-/* Ensure rich text editor content is dark and visible */
-.prose {
-  color: #1f2937 !important; /* text-gray-800 */
-  opacity: 1 !important;
-}
-
-.prose p, .prose div, .prose span {
-  color: #1f2937 !important; /* text-gray-800 */
-  opacity: 1 !important;
-}
-
-/* Ensure any content inserted into rich text editor has dark text */
+/* Ensure any content inserted into rich text editor has dark text and LTR direction */
 [contenteditable="true"] * {
   color: #1f2937 !important; /* text-gray-800 */
   opacity: 1 !important;
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
 }
 
 /* Ensure links in rich text editor are visible */
 [contenteditable="true"] a {
   color: #2563eb !important; /* text-blue-600 */
   opacity: 1 !important;
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
 }
 
 /* Ensure bold text is dark and visible */
@@ -72,6 +114,10 @@ input::placeholder, textarea::placeholder {
   color: #1f2937 !important; /* text-gray-800 */
   opacity: 1 !important;
   font-weight: 600 !important;
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
 }
 
 /* Ensure italic text is dark and visible */
@@ -80,4 +126,90 @@ input::placeholder, textarea::placeholder {
   color: #1f2937 !important; /* text-gray-800 */
   opacity: 1 !important;
   font-style: italic !important;
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
+}
+
+/* Force LTR direction for all text inputs with higher specificity */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+textarea,
+select {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
+/* Ensure form elements maintain LTR direction */
+form {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Override any potential RTL settings from browser/system */
+html {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Force LTR for all text content with high specificity */
+* {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+}
+
+/* Additional override for any RTL language settings */
+[dir="rtl"] {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+}
+
+/* Ensure all form inputs override any RTL settings */
+input[dir="rtl"],
+textarea[dir="rtl"],
+select[dir="rtl"] {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+}
+
+/* Specific rich text editor container overrides */
+div[contenteditable="true"] {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
+/* Override any potential browser default styles */
+div[contenteditable="true"]:focus {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
+/* Force LTR for any dynamically created content */
+div[contenteditable="true"] br,
+div[contenteditable="true"] p,
+div[contenteditable="true"] div,
+div[contenteditable="true"] span {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
 }
