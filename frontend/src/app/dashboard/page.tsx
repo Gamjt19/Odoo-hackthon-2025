@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import { 
   Plus, 
   Search, 
@@ -45,43 +47,22 @@ interface Question {
 }
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user: authUser, loading: authLoading } = useAuth();
+  const router = useRouter();
   const [recentQuestions, setRecentQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    fetchUserData();
-    fetchRecentQuestions();
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        window.location.href = '/login';
+    if (!authLoading) {
+      if (!authUser) {
+        router.push('/login');
         return;
       }
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/profile`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      } else if (response.status === 401) {
-        localStorage.removeItem('accessToken');
-        window.location.href = '/login';
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    } finally {
+      fetchRecentQuestions();
       setLoading(false);
     }
-  };
+  }, [authUser, authLoading, router]);
 
   const fetchRecentQuestions = async () => {
     try {
@@ -114,7 +95,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!user) {
+  if (!authUser) {
     return null;
   }
 
@@ -126,7 +107,7 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-gray-600">Welcome back, {user.username}!</p>
+              <p className="text-gray-600">Welcome back, {authUser.username}!</p>
             </div>
             <Link
               href="/ask"
@@ -149,7 +130,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">StackPoints</p>
-                    <p className="text-2xl font-bold text-gray-900">{user.stackPoints}</p>
+                    <p className="text-2xl font-bold text-gray-900">{authUser.stackPoints}</p>
                   </div>
                   <div className="p-3 bg-blue-100 rounded-lg">
                     <Award className="h-6 w-6 text-blue-600" />
@@ -158,7 +139,7 @@ export default function DashboardPage() {
                 <div className="mt-4">
                   <div className="flex items-center text-sm text-gray-500">
                     <TrendingUp className="h-4 w-4 mr-1" />
-                    <span>+{Math.floor(user.stackPoints * 0.1)} this week</span>
+                    <span>+{Math.floor(authUser.stackPoints * 0.1)} this week</span>
                   </div>
                 </div>
               </div>
@@ -166,8 +147,8 @@ export default function DashboardPage() {
               <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Reputation</p>
-                    <p className="text-2xl font-bold text-gray-900">{user.reputation}</p>
+                    <p className="text-sm font-medium text-gray-600">Level</p>
+                    <p className="text-2xl font-bold text-gray-900">{authUser.level}</p>
                   </div>
                   <div className="p-3 bg-green-100 rounded-lg">
                     <Users className="h-6 w-6 text-green-600" />
@@ -176,7 +157,7 @@ export default function DashboardPage() {
                 <div className="mt-4">
                   <div className="flex items-center text-sm text-gray-500">
                     <Activity className="h-4 w-4 mr-1" />
-                    <span>Level {Math.floor(user.reputation / 100) + 1}</span>
+                    <span>Active member</span>
                   </div>
                 </div>
               </div>
@@ -185,7 +166,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">Questions</p>
-                    <p className="text-2xl font-bold text-gray-900">{user.questionsCount}</p>
+                    <p className="text-2xl font-bold text-gray-900">{authUser.stats?.questionsAsked || 0}</p>
                   </div>
                   <div className="p-3 bg-purple-100 rounded-lg">
                     <BookOpen className="h-6 w-6 text-purple-600" />
@@ -194,7 +175,7 @@ export default function DashboardPage() {
                 <div className="mt-4">
                   <div className="flex items-center text-sm text-gray-500">
                     <MessageSquare className="h-4 w-4 mr-1" />
-                    <span>{user.answersCount} answers</span>
+                    <span>{authUser.stats?.answersGiven || 0} answers</span>
                   </div>
                 </div>
               </div>
@@ -301,13 +282,13 @@ export default function DashboardPage() {
             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Badges</h3>
               <div className="space-y-3">
-                {user.badges.length > 0 ? (
-                  user.badges.map((badge) => (
-                    <div key={badge} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                {authUser.achievements && authUser.achievements.length > 0 ? (
+                  authUser.achievements.map((achievement) => (
+                    <div key={achievement.name} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                       <div className="p-2 bg-yellow-100 rounded-lg">
                         <Award className="h-4 w-4 text-yellow-600" />
                       </div>
-                      <span className="font-medium text-gray-900">{badge}</span>
+                      <span className="font-medium text-gray-900">{achievement.name}</span>
                     </div>
                   ))
                 ) : (
@@ -319,7 +300,7 @@ export default function DashboardPage() {
             {/* Member Since */}
             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Member Since</h3>
-              <p className="text-gray-600">{formatDate(user.joinDate)}</p>
+              <p className="text-gray-600">{formatDate(authUser.joinDate)}</p>
             </div>
           </div>
         </div>

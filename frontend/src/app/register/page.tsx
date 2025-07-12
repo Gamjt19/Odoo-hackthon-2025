@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, Mail, Lock, User, CheckCircle, AlertCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -58,41 +60,23 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Registration successful
-        router.push('/login?message=Registration successful! Please log in.');
+      await register(formData.username, formData.email, formData.password);
+      // The AuthContext will handle the redirect to dashboard
+    } catch (error: any) {
+      // Handle different error formats from backend
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        // Validation errors
+        const validationErrors: Record<string, string> = {};
+        error.response.data.errors.forEach((err: any) => {
+          validationErrors[err.path] = err.msg;
+        });
+        setErrors(validationErrors);
+      } else if (error.response?.data?.error) {
+        // Single error message
+        setErrors({ general: error.response.data.error });
       } else {
-        // Handle different error formats from backend
-        if (data.errors && Array.isArray(data.errors)) {
-          // Validation errors
-          const validationErrors: Record<string, string> = {};
-          data.errors.forEach((error: any) => {
-            validationErrors[error.path] = error.msg;
-          });
-          setErrors(validationErrors);
-        } else if (data.error) {
-          // Single error message
-          setErrors({ general: data.error });
-        } else {
-          setErrors({ general: 'Registration failed' });
-        }
+        setErrors({ general: error.message || 'Registration failed' });
       }
-    } catch (error) {
-      setErrors({ general: 'Network error. Please try again.' });
     } finally {
       setLoading(false);
     }

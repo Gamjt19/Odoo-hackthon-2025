@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { useAnalytics } from '@/contexts/AnalyticsContext'
@@ -15,14 +15,16 @@ import {
   Menu,
   X
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+// import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 
 const Navigation: React.FC = () => {
   const { user, logout } = useAuth()
   const { trackPageView } = useAnalytics()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const userMenuRef = useRef<HTMLDivElement>(null)
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,6 +38,20 @@ const Navigation: React.FC = () => {
     logout()
     toast.success('Logged out successfully')
   }
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const getLevelColor = (level: string) => {
     switch (level) {
@@ -114,8 +130,11 @@ const Navigation: React.FC = () => {
                 </button>
 
                 {/* User Menu */}
-                <div className="relative">
-                  <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600">
+                <div className="relative" ref={userMenuRef}>
+                  <button 
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
+                  >
                     {user.avatar ? (
                       <img 
                         src={user.avatar} 
@@ -134,6 +153,52 @@ const Navigation: React.FC = () => {
                       </div>
                     </div>
                   </button>
+
+                  {/* Desktop User Dropdown */}
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                        <Link 
+                          href="/dashboard" 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => {
+                            trackPageView('dashboard')
+                            setIsUserMenuOpen(false)
+                          }}
+                        >
+                          Dashboard
+                        </Link>
+                        <Link 
+                          href="/profile" 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => {
+                            trackPageView('profile')
+                            setIsUserMenuOpen(false)
+                          }}
+                        >
+                          My Profile
+                        </Link>
+                        <Link 
+                          href="/ask" 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => {
+                            trackPageView('ask')
+                            setIsUserMenuOpen(false)
+                          }}
+                        >
+                          Ask Question
+                        </Link>
+                        <hr className="my-2" />
+                        <button
+                          onClick={() => {
+                            handleLogout()
+                            setIsUserMenuOpen(false)
+                          }}
+                          className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+                        >
+                          Logout
+                        </button>
+                    </div>
+                  )}
                 </div>
               </>
             ) : (
@@ -169,14 +234,8 @@ const Navigation: React.FC = () => {
       </div>
 
       {/* Mobile menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-t border-gray-200"
-          >
+      {isMenuOpen && (
+        <div className="md:hidden bg-white border-t border-gray-200">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {/* Mobile Search */}
               <form onSubmit={handleSearch} className="px-3 py-2">
@@ -280,9 +339,8 @@ const Navigation: React.FC = () => {
                 </>
               )}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </nav>
   )
 }

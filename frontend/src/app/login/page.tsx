@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -48,30 +50,10 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Store token
-        localStorage.setItem('accessToken', data.token);
-        
-        // Redirect to dashboard or home
-        router.push('/dashboard');
-      } else {
-        setErrors({ general: data.error || data.message || 'Login failed' });
-      }
-    } catch (error) {
-      setErrors({ general: 'Network error. Please try again.' });
+      await login(formData.email, formData.password);
+      // The AuthContext will handle the redirect to dashboard
+    } catch (error: any) {
+      setErrors({ general: error.message || 'Login failed' });
     } finally {
       setLoading(false);
     }
